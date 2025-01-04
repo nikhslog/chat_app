@@ -1,10 +1,11 @@
+//pages/index.js:
 import Head from 'next/head';
 import { useEffect } from 'react';
-import styles from '../styles/Home.module.css';
 
 export default function Home() {
   useEffect(() => {
     // Typing animation
+   if (typeof window === 'undefined') return;
     const words = ["Mumtaz.", "Moonchild."];
     const animatedWordElement = document.querySelector(".animated-word");
     let wordIndex = 0;
@@ -108,7 +109,7 @@ export default function Home() {
         }
     }
 
-    async function joinChat() {
+    const joinChat = async () => {
         try {
             showLoading('Joining chat...');
             const response = await fetch(`${API_BASE_URL}/users`, {
@@ -168,7 +169,7 @@ export default function Home() {
         }
     }
 
-    async function sendMessage(sender = currentUser, text = messageInput.value.trim()) {
+    const sendMessage = async () => {
         try {
             if (!text) return;
 
@@ -425,7 +426,7 @@ export default function Home() {
           </div>
           <div className="name-selection-area" id="nameSelection">
             <div>Click to join chat:</div>
-            <button className="join-button" onClick={() => window.joinChat()}>Join Chat</button>
+            <button className="join-button" onClick={joinChat}>Join Chat</button>
             <div className="user-info" id="currentUserInfo"></div>
             <div className="error-message" id="errorMessage"></div>
             <div className="loading" id="loadingMessage"></div>
@@ -433,7 +434,7 @@ export default function Home() {
           <div className="chat-messages" id="messageArea"></div>
           <div className="chat-input">
             <input type="text" id="messageInput" placeholder="Write a message..." />
-            <button onClick={() => window.sendMessage()}>Send</button>
+            <button onClick={sendMessage}>Send</button>
           </div>
         </div>
       </section>
