@@ -149,6 +149,9 @@
             margin-top: 10px;
         }
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
 </head>
 <body>
     <section class="hero">
@@ -184,158 +187,119 @@
     </section>
 
     <script>
-        const messageArea = document.getElementById('messageArea');
-        const messageInput = document.getElementById('messageInput');
-        const nameSelection = document.getElementById('nameSelection');
-        const currentUserInfo = document.getElementById('currentUserInfo');
+        // Replace this config with your Firebase config
+        const firebaseConfig = {
+          apiKey: "AIzaSyDuk-a6uQ_IMCqOzahu3jlozaDgJX-G36k",
+          authDomain: "vintage-chat-36952.firebaseapp.com",
+          databaseURL: "https://vintage-chat-36952-default-rtdb.firebaseio.com",
+          projectId: "vintage-chat-36952",
+          storageBucket: "vintage-chat-36952.firebasestorage.app",
+          messagingSenderId: "502268108781",
+          appId: "1:502268108781:web:231b380f8abdfa78f751e4",
+          measurementId: "G-1DHFHTYP7C"
+        };
         
-        // Initialize or get chat state
-        function initializeChatState() {
-            if (!localStorage.getItem('chatState')) {
-                localStorage.setItem('chatState', JSON.stringify({
-                    messages: [],
-                    nikhilTaken: false,
-                    nikhTaken: false,
-                    activeUsers: []
-                }));
-            }
-            return JSON.parse(localStorage.getItem('chatState'));
-        }
-
-        let chatState = initializeChatState();
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         let currentUser = '';
 
-        // Function to join chat
-        function joinChat() {
-            chatState = JSON.parse(localStorage.getItem('chatState'));
-            
-            // Determine which name to assign
-            if (!chatState.nikhilTaken) {
-                currentUser = 'Nikhil';
-                chatState.nikhilTaken = true;
-            } else if (!chatState.nikhTaken) {
-                currentUser = 'Nikh';
-                chatState.nikhTaken = true;
-            } else {
-                alert('Chat room is full!');
-                return;
-            }
-
-            chatState.activeUsers.push(currentUser);
-            localStorage.setItem('chatState', JSON.stringify(chatState));
-
-            // Update UI
-            nameSelection.style.display = 'none';
-            messageArea.style.display = 'block';
-            document.querySelector('.chat-input').style.display = 'flex';
-            currentUserInfo.textContent = `You are: ${currentUser}`;
-
-            // Add system message
-            const joinMessage = {
-                sender: 'System',
-                text: `${currentUser} has joined the chat`,
-                timestamp: Date.now()
-            };
-            chatState.messages.push(joinMessage);
-            localStorage.setItem('chatState', JSON.stringify(chatState));
-            
-            // Start message polling
-            updateMessages();
-            setInterval(updateMessages, 1000);
-
-            // Set up disconnect handling
-            window.addEventListener('beforeunload', handleDisconnect);
+        // Add this right after firebase.initializeApp(firebaseConfig);
+        if (!firebase.apps.length) {
+            console.error('Firebase failed to initialize');
+        } else {
+            console.log('Firebase initialized successfully');
         }
 
-        function handleDisconnect() {
-            chatState = JSON.parse(localStorage.getItem('chatState'));
-            if (currentUser === 'Nikhil') {
-                chatState.nikhilTaken = false;
-            } else if (currentUser === 'Nikh') {
-                chatState.nikhTaken = false;
+        // Test database connection
+        db.ref('.info/connected').on('value', (snap) => {
+            if (snap.val() === true) {
+                console.log('Connected to Firebase');
+            } else {
+                console.log('Disconnected from Firebase');
             }
-            chatState.activeUsers = chatState.activeUsers.filter(user => user !== currentUser);
-            
-            // Add disconnect message
-            chatState.messages.push({
-                sender: 'System',
-                text: `${currentUser} has left the chat`,
-                timestamp: Date.now()
+        });
+
+        function joinChat() {
+            // Check available usernames
+            db.ref('users').once('value', (snapshot) => {
+                const users = snapshot.val() || {};
+                
+                if (!users.nikhilTaken) {
+                    currentUser = 'Nikhil';
+                    db.ref('users').update({ nikhilTaken: true });
+                } else if (!users.nikhTaken) {
+                    currentUser = 'Nikh';
+                    db.ref('users').update({ nikhTaken: true });
+                } else {
+                    alert('Chat room is full!');
+                    return;
+                }
+
+                // Update UI
+                document.getElementById('nameSelection').style.display = 'none';
+                document.getElementById('messageArea').style.display = 'block';
+                document.querySelector('.chat-input').style.display = 'flex';
+                document.getElementById('currentUserInfo').textContent = `You are: ${currentUser}`;
+
+                // Send join message
+                db.ref('messages').push({
+                    sender: 'System',
+                    text: `${currentUser} has joined the chat`,
+                    timestamp: Date.now()
+                });
             });
-            
-            localStorage.setItem('chatState', JSON.stringify(chatState));
         }
 
         function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
+            
             if (message && currentUser) {
-                chatState = JSON.parse(localStorage.getItem('chatState'));
-                chatState.messages.push({
+                db.ref('messages').push({
                     sender: currentUser,
                     text: message,
                     timestamp: Date.now()
                 });
-                localStorage.setItem('chatState', JSON.stringify(chatState));
                 messageInput.value = '';
-                updateMessages();
             }
         }
 
-        function updateMessages() {
-            const newState = JSON.parse(localStorage.getItem('chatState'));
-            if (!newState) return;
-
+        // Listen for messages
+        db.ref('messages').on('value', (snapshot) => {
+            const messageArea = document.getElementById('messageArea');
             messageArea.innerHTML = '';
-            newState.messages.forEach(msg => {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
+            
+            const messages = snapshot.val() || {};
+            Object.values(messages).forEach(msg => {
+                const div = document.createElement('div');
+                div.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
                 if (msg.sender === 'System') {
-                    messageDiv.style.backgroundColor = '#718096';
-                    messageDiv.style.color = 'white';
-                    messageDiv.style.textAlign = 'center';
-                    messageDiv.style.margin = '8px auto';
+                    div.style.backgroundColor = '#718096';
+                    div.style.color = 'white';
+                    div.style.textAlign = 'center';
                 }
-                messageDiv.textContent = msg.sender === 'System' ? msg.text : `${msg.sender}: ${msg.text}`;
-                messageArea.appendChild(messageDiv);
+                div.textContent = msg.sender === 'System' ? msg.text : `${msg.sender}: ${msg.text}`;
+                messageArea.appendChild(div);
             });
             messageArea.scrollTop = messageArea.scrollHeight;
-        }
-
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
         });
 
-        // Typing animation
-        const words = ["Mumtaz.", "Moonchild."];
-        const animatedWordElement = document.querySelector(".animated-word");
-        let wordIndex = 0;
-        let charIndex = 0;
-        let isDeleting = false;
-
-        function typeAnimation() {
-            const currentWord = words[wordIndex];
-            const displayedText = isDeleting
-                ? currentWord.substring(0, charIndex--)
-                : currentWord.substring(0, charIndex++);
-
-            animatedWordElement.textContent = displayedText;
-
-            if (!isDeleting && charIndex === currentWord.length) {
-                setTimeout(() => (isDeleting = true), 1000);
-            } else if (isDeleting && charIndex === 0) {
-                isDeleting = false;
-                wordIndex = (wordIndex + 1) % words.length;
+        // Handle user disconnect
+        window.addEventListener('beforeunload', () => {
+            if (currentUser) {
+                db.ref('users').update({
+                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'nikhTaken']: false
+                });
+                db.ref('messages').push({
+                    sender: 'System',
+                    text: `${currentUser} has left the chat`,
+                    timestamp: Date.now()
+                });
             }
-
-            setTimeout(typeAnimation, isDeleting ? 50 : 100);
-        }
-
-        typeAnimation();
-
+        });
         // Initial UI setup
-        messageArea.style.display = 'none';
+        document.getElementById('messageArea').style.display = 'none';
         document.querySelector('.chat-input').style.display = 'none';
     </script>
 </body>
