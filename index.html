@@ -191,7 +191,7 @@
         const firebaseConfig = {
           apiKey: "AIzaSyDuk-a6uQ_IMCqOzahu3jlozaDgJX-G36k",
           authDomain: "vintage-chat-36952.firebaseapp.com",
-          databaseURL: "https://vintage-chat-36952-default-rtdb.firebaseio.com",
+          databaseURL: "https://vintage-chat-36952-default-rtdb.asia-southeast1.firebasedatabase.app",
           projectId: "vintage-chat-36952",
           storageBucket: "vintage-chat-36952.firebasestorage.app",
           messagingSenderId: "502268108781",
@@ -298,6 +298,32 @@
                 });
             }
         });
+        // Typing animation
+        const words = ["Mumtaz.", "Moonchild."];
+        const animatedWordElement = document.querySelector(".animated-word");
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+
+        function typeAnimation() {
+            const currentWord = words[wordIndex];
+            const displayedText = isDeleting
+                ? currentWord.substring(0, charIndex--)
+                : currentWord.substring(0, charIndex++);
+
+            animatedWordElement.textContent = displayedText;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                setTimeout(() => (isDeleting = true), 1000);
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+            }
+
+            setTimeout(typeAnimation, isDeleting ? 50 : 100);
+        }
+
+        typeAnimation();
         // Initial UI setup
         document.getElementById('messageArea').style.display = 'none';
         document.querySelector('.chat-input').style.display = 'none';
