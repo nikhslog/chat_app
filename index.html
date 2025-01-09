@@ -390,7 +390,7 @@
         </div>
     </section>
     <script>
-function init3DModel() {
+        function init3DModel() {
     const container = document.getElementById('taj-model-container');
     
     // Create controls container and append to chat container
@@ -517,8 +517,7 @@ function init3DModel() {
 window.addEventListener('load', init3DModel);
         
         window.addEventListener('load', init3DModel);
-        
-        // Initialize or get chat state
+        // Replace this config with your Firebase config
         const firebaseConfig = {
           apiKey: "AIzaSyDuk-a6uQ_IMCqOzahu3jlozaDgJX-G36k",
           authDomain: "vintage-chat-36952.firebaseapp.com",
@@ -658,6 +657,41 @@ window.addEventListener('load', init3DModel);
         // Initial UI setup
         document.getElementById('messageArea').style.display = 'none';
         document.querySelector('.chat-input').style.display = 'none';
+        window.onload = function() {
+        // Check if URL contains scroll parameter
+        if (window.location.search.includes('scroll=bottom')) {
+            // Attempt multiple scroll methods for better compatibility
+            setTimeout(function() {
+                // Method 1: Scroll to max height
+                window.scrollTo(0, document.documentElement.scrollHeight);
+                
+                // Method 2: Alternative scroll
+                window.scrollTo(0, 99999);
+                
+                // Method 3: Smooth scroll to bottom
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+                
+                // Method 4: Try scrolling the body
+                document.body.scrollTop = document.body.scrollHeight;
+                document.documentElement.scrollTop = document.documentElement.scrollHeight;
+            }, 100); // Small delay to ensure page is fully loaded
+        }
+    };
+// Initialize the animation
+const animation = lottie.loadAnimation({
+    container: document.getElementById('lottie-container'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'Animation - 1736322678190.json',
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice',
+        clearCanvas: true
+    }
+});
 
 // Add class to make visible when loaded
 animation.addEventListener('DOMLoaded', function() {
