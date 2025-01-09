@@ -273,6 +273,9 @@
 }
         
     </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+
 </head>
 <body>
     <section class="hero">
@@ -389,6 +392,7 @@
 </a>
         </div>
     </section>
+
     <script>
         function init3DModel() {
     const container = document.getElementById('taj-model-container');
@@ -558,9 +562,9 @@ window.addEventListener('load', init3DModel);
                 if (!users.nikhilTaken) {
                     currentUser = 'Nikhil';
                     db.ref('users').update({ nikhilTaken: true });
-                } else if (!users.nikhTaken) {
-                    currentUser = 'Nikh';
-                    db.ref('users').update({ nikhTaken: true });
+                } else if (!users.hernameTaken) {
+                    currentUser = 'hername';
+                    db.ref('users').update({ hernameTaken: true });
                 } else {
                     alert('Chat room is full!');
                     return;
@@ -619,7 +623,7 @@ window.addEventListener('load', init3DModel);
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
                 db.ref('users').update({
-                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'nikhTaken']: false
+                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'hernameTaken']: false
                 });
                 db.ref('messages').push({
                     sender: 'System',
