@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vintage Chat</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
     <style>
         @font-face {
             font-family: 'Rumburak';
@@ -15,18 +19,7 @@
             font-family: 'Rumburak', serif;
             overflow-x: hidden;
         }
-        .hero {
-            height: 100vh;
-            background: url('Untitled design (5).png') center/cover no-repeat;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .text-wrapper {
-            transform: translateY(30px) translateX(-100px);
-            z-index: 1;
-        }
+        
         .text {
             color: #0b141a;
             font-size: 2.5rem;
@@ -49,25 +42,58 @@
             overflow: hidden;
             display: inline-block;
         }
+        .hero {
+            height: 100vh;
+            background: url('Untitled design (16).png') center/cover no-repeat;
+            background-attachment: fixed; /* Prevents image from moving */
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            z-index: 1;
+        }
+        
         .chat-section {
             min-height: 100vh;
-            background: url('Untitled design (7).png') center/cover no-repeat;
+            background: url('Untitled design (19).png') center/cover no-repeat;
+            background-attachment: fixed; /* Prevents image from moving */
             padding: 2rem;
             display: flex;
-            justify-content: flex-start;
+            justify-content: flex-end;
             align-items: center;
+            gap: 50px;
+            padding-right: 15%;
+            position: relative;
+            z-index: 2;
         }
-        .chat-container {
-            width: 300px;
-            height: 400px;
-            background: rgba(229, 229, 229, 0.85);
-            border-radius: 10px;
-            border: 2px solid #4a5568;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            margin-left: 50px;
-            display: flex;
-            flex-direction: column;
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            overflow: hidden;
         }
+#taj-model-container {
+    width: 1200px;
+    height: 1200px;
+    background: transparent;
+    overflow: visible;
+    margin-right: -360px;
+}
+        
+.chat-container {
+    width: 350px;
+    height: 400px;
+    background: rgba(229, 229, 229, 0.85);
+    border-radius: 10px;
+    border: 2px solid #4a5568;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    margin-right: 0px;
+    position: relative; /* Added for absolute positioning of controls */
+}
+        
+        /* Rest of your existing styles remain the same */
         .chat-header {
             padding: 10px;
             background: #4a5568;
@@ -148,33 +174,129 @@
             font-size: 1rem;
             margin-top: 10px;
         }
-    </style>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+        #lottie-container {
+    position: absolute;
+    z-index: 10;
+    width: 100px;
+    height: 100px;
+    left: 50%;
+    bottom: 5px;  /* Changed from top: 70% to bottom: 40px */
+    transform: translateX(-50%);  /* Changed to only transform X */
+    opacity: 0;  /* Start with opacity 0 */
+    transition: opacity 0.5s ease;
+}
 
+#lottie-container.visible {
+    opacity: 1;
+}
+.heart-container {
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    right: 50px;
+    bottom: 100px;
+    z-index: 100;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+.heart-container:hover {
+    transform: scale(1.1);
+}
+.heart-container svg {
+    max-width: 100px;
+    width: 100%;
+    height: 100%;
+}
+        
+        .heart-container svg .st0 { fill:#3D3D3D; }
+        .heart-container svg .st1 {
+            fill-rule: evenodd;
+            clip-rule: evenodd;
+            fill: #ffffff;
+        }
+        .heart-container svg .st2 { fill:#4a5568; }
+        .heart-container svg .st3 { fill:#ffffff; }
+        
+        #a {
+            animation: a 2s ease-in-out infinite;
+        }
+        
+
+        @keyframes a {
+    0% { transform: translate(-50%, -50%) rotate(0) scale(1.2); }
+    2.5% { transform: translate(-50%, -50%) rotate(5deg) scale(1.3); }
+    5% { transform: translate(-50%, -50%) rotate(0) scale(1.3); }
+    7.5% { transform: translate(-50%, -50%) rotate(5deg) scale(1.3); }
+    10% { transform: translate(-50%, -50%) rotate(0) scale(1.2); }
+    100% { transform: translate(-50%, -50%) rotate(0) scale(1.2); }
+}
+.controls-container {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+}
+
+.controls-container button {
+    padding: 8px 16px;
+    background: #4a5568;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.controls-container .info-btn {
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-style: italic;
+}
+
+.controls-container .tooltip {
+    position: absolute;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    top: 100%;
+    left: 0;
+    margin-top: 8px;
+    width: 200px;
+    text-align: center;
+    display: none;
+}
+.controls-container .tooltip {
+    font-family: Arial, sans-serif;
+}
+        
+    </style>
 </head>
 <body>
     <section class="hero">
         <div class="text-wrapper">
             <div class="text">
-                That Shah Jahan didn't have the chance to show the Taj to his Mumtaz but,
+                That Shah Jahan didn't have the chance to show Taj to his Mumtaz but,
             </div>
             <div class="text">
-                I got to show my Taj Mahal to 
+                I got to show Taj Mahal to my
                 <span class="animated-word-wrapper">
                     <span class="animated-word"></span>
                 </span>
             </div>
         </div>
+        <div id="lottie-container"></div>
     </section>
+    
 
     <section class="chat-section">
         <div class="chat-container">
             <div class="chat-header">
-                <span>Vintage Chat</span>
+                <span></span>
             </div>
             <div class="name-selection-area" id="nameSelection">
-                <div>Click to join chat:</div>
                 <button class="join-button" onclick="joinChat()">Join Chat</button>
                 <div class="user-info" id="currentUserInfo"></div>
             </div>
@@ -184,122 +306,338 @@
                 <button onclick="sendMessage()">Send</button>
             </div>
         </div>
+        <div id="taj-model-container"></div>
+        <div class="heart-container">
+            <a href="mem.html" class="heart-container">
+            <svg version="1.1" id="a" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 48.4 28.8" style="enable-background:new 0 0 48.4 28.8;" xml:space="preserve">
+  <g>
+    <g>
+      <g>
+        <path class="st0" d="M26.1,9.9c-1,0-1.7-0.1-1.9-0.1c-0.6,0.1-5.4,0.6-7.6-1.5c-1.6-1.5-2.4-2.9-2.4-4.2c0-1,0.5-2,1.4-2.9
+                             c1.5-1.4,4-2.3,7.5,0.9c0.5,0.4,0.8,1,1.1,1.7c0.3-0.7,0.7-1.2,1.1-1.7c3.5-3.2,6-2.3,7.5-0.9c0.9,0.9,1.4,1.8,1.4,2.9
+                             c0,1.3-0.8,2.7-2.4,4.2C30.4,9.7,27.9,9.9,26.1,9.9z M18.6,1c-0.8,0-1.6,0.3-2.4,1c-0.7,0.7-1.1,1.4-1.1,2.1c0,1,0.7,2.2,2,3.5
+                             c1.6,1.5,4.9,1.4,6.3,1.3l-1-0.5C22.4,8.4,19.5,7,18,5.6C17.3,5,17,4.4,17,3.8c0-0.5,0.2-0.8,0.3-0.9l0,0c0,0,1.1-0.9,2.8,0.7
+                             c1.5,1.4,3,4.1,3,4.2l0.6,1.1c0.2,0,0.3,0,0.3,0l-0.4-2.9c-0.2-1.4-0.6-2.4-1.3-3C21,1.6,19.8,1,18.6,1z M24.9,8.9
+                             c1.4,0.1,4.7,0.2,6.3-1.3c1.4-1.3,2-2.4,2-3.5c0-0.8-0.4-1.4-1.1-2.1c-1.7-1.6-3.7-1.3-6.1,0.9c-0.7,0.6-1.1,1.6-1.3,3l-0.4,2.9
+                             c0,0,0.1,0,0.3,0l0.6-1.1c0.1-0.1,1.6-2.8,3-4.2l0,0c1.7-1.6,2.8-0.7,2.8-0.7c0.1,0.1,0.4,0.4,0.3,0.9c0,0.6-0.4,1.2-1.1,1.8
+                             C28.9,7,26,8.4,25.9,8.4L24.9,8.9z M28.9,4.3c-0.7,0.6-1.4,1.6-1.9,2.4c0.9-0.5,2-1.2,2.7-1.8c0.7-0.7,0.8-1.1,0.7-1.3
+                             C30.2,3.5,29.7,3.6,28.9,4.3L28.9,4.3z M18,3.6c-0.1,0.2,0,0.6,0.7,1.3c0.7,0.6,1.8,1.3,2.7,1.8c-0.5-0.8-1.2-1.8-1.9-2.4
+                             C18.7,3.6,18.2,3.5,18,3.6z"/>
+      </g>
+    </g>
+    <g>
+      <path class="st1" d="M22.4,2.9C21,1.6,19.8,1,18.6,1c-0.8,0-1.6,0.3-2.4,1c-0.7,0.7-1.1,1.4-1.1,2.1c0,1,0.7,2.2,2,3.5
+                           c1.6,1.5,4.9,1.4,6.3,1.3l-1-0.5C22.4,8.4,19.5,7,18,5.6C17.3,5,17,4.4,17,3.8c0-0.5,0.2-0.8,0.3-0.9l0,0c0,0,1.1-0.9,2.8,0.7
+                           c1.5,1.4,3,4.1,3,4.2l0.6,1.1c0.2,0,0.3,0,0.3,0l-0.4-2.9C23.5,4.5,23.1,3.5,22.4,2.9z"/>
+      <path class="st1" d="M31.1,7.6c1.4-1.3,2-2.4,2-3.5c0-0.8-0.4-1.4-1.1-2.1c-1.7-1.6-3.7-1.3-6.1,0.9c-0.7,0.6-1.1,1.6-1.3,3
+                           l-0.4,2.9c0,0,0.1,0,0.3,0l0.6-1.1c0.1-0.1,1.6-2.8,3-4.2c1.7-1.6,2.8-0.7,2.8-0.7c0.1,0.1,0.4,0.4,0.3,0.9c0,0.6-0.4,1.2-1.1,1.8
+                           C28.9,7,26,8.4,25.9,8.4l-1,0.5C26.3,9,29.6,9.1,31.1,7.6z"/>
+    </g>
+    <g>
+      <path class="st0" d="M34.4,28.8H14c-0.8,0-1.5-0.7-1.5-1.5V16.8c0-0.8,0.7-1.5,1.5-1.5h20.4c0.8,0,1.5,0.7,1.5,1.5v10.4
+                           C35.9,28.1,35.2,28.8,34.4,28.8z M14,16.3c-0.3,0-0.5,0.2-0.5,0.5v10.4c0,0.3,0.2,0.5,0.5,0.5h20.4c0.3,0,0.5-0.2,0.5-0.5V16.8
+                           c0-0.3-0.2-0.5-0.5-0.5H14z"/>
+    </g>
+    <path class="st2" d="M34.4,16.3H14c-0.3,0-0.5,0.2-0.5,0.5v10.4c0,0.3,0.2,0.5,0.5,0.5h20.4c0.3,0,0.5-0.2,0.5-0.5V16.8
+                         C34.9,16.5,34.7,16.3,34.4,16.3z"/>
+    <g>
+      <path class="st0" d="M35.6,16.3H12.7c-0.8,0-1.5-0.7-1.5-1.5v-3c0-0.8,0.7-1.5,1.5-1.5h22.9c0.8,0,1.5,0.7,1.5,1.5v3
+                           C37.1,15.6,36.5,16.3,35.6,16.3z M12.7,11.3c-0.3,0-0.5,0.2-0.5,0.5v3c0,0.3,0.2,0.5,0.5,0.5h22.9c0.3,0,0.5-0.2,0.5-0.5v-3
+                           c0-0.3-0.2-0.5-0.5-0.5H12.7z"/>
+    </g>
+    <path class="st2" d="M35.6,11.3H12.7c-0.3,0-0.5,0.2-0.5,0.5v3c0,0.3,0.2,0.5,0.5,0.5h22.9c0.3,0,0.5-0.2,0.5-0.5v-3
+                         C36.1,11.6,35.9,11.3,35.6,11.3z"/>
+    <g>
+      <path class="st0" d="M27.2,16.3h-6v-6h6V16.3z M22.2,15.3h4v-4h-4V15.3z"/>
+    </g>
+    <rect x="22.2" y="11.3" class="st3" width="4" height="4"/>
+    <g>
+      <path class="st0" d="M27.2,28.8h-6V15.3h6V28.8z M22.2,27.8h4V16.3h-4V27.8z"/>
+    </g>
+    <rect x="22.2" y="16.3" class="st3" width="4" height="11.4"/>
+    <g>
+      <g>
+        <path class="st0" d="M47.9,16.3h-4.5c-0.3,0-0.5-0.2-0.5-0.5c0-0.3,0.2-0.5,0.5-0.5h4.5c0.3,0,0.5,0.2,0.5,0.5
+                             C48.4,16.1,48.1,16.3,47.9,16.3z"/>
+      </g>
+      <g>
+        <path class="st0" d="M42.6,11.3c-0.2,0-0.3-0.1-0.4-0.2c-0.1-0.2-0.1-0.5,0.2-0.7l3.9-2.3c0.2-0.1,0.5-0.1,0.7,0.2
+                             C47.1,8.5,47,8.9,46.7,9l-3.9,2.3C42.7,11.3,42.7,11.3,42.6,11.3z"/>
+      </g>
+      <g>
+        <path class="st0" d="M46.5,23.6c-0.1,0-0.2,0-0.2-0.1l-3.9-2.3c-0.2-0.1-0.3-0.4-0.2-0.7s0.4-0.3,0.7-0.2l3.9,2.3
+                             c0.2,0.1,0.3,0.4,0.2,0.7C46.8,23.5,46.7,23.6,46.5,23.6z"/>
+      </g>
+    </g>
+    <g>
+      <g>
+        <path class="st0" d="M5,16.3H0.5c-0.3,0-0.5-0.2-0.5-0.5c0-0.3,0.2-0.5,0.5-0.5H5c0.3,0,0.5,0.2,0.5,0.5
+                             C5.5,16.1,5.3,16.3,5,16.3z"/>
+      </g>
+      <g>
+        <path class="st0" d="M1.9,23.6c-0.2,0-0.3-0.1-0.4-0.2c-0.1-0.2-0.1-0.5,0.2-0.7l3.9-2.3c0.2-0.1,0.5-0.1,0.7,0.2
+                             c0.1,0.2,0.1,0.5-0.2,0.7l-3.9,2.3C2.1,23.6,2,23.6,1.9,23.6z"/>
+      </g>
+      <g>
+        <path class="st0" d="M5.8,11.3c-0.1,0-0.2,0-0.2-0.1L1.6,9C1.4,8.9,1.3,8.5,1.5,8.3C1.6,8.1,1.9,8,2.1,8.1L6,10.4
+                             c0.2,0.1,0.3,0.4,0.2,0.7C6.1,11.2,6,11.3,5.8,11.3z"/>
+      </g>
+    </g>
+  </g>
+</svg>
+</a>
+        </div>
     </section>
-
     <script>
-        // Replace this config with your Firebase config
-        const firebaseConfig = {
-          apiKey: "AIzaSyDuk-a6uQ_IMCqOzahu3jlozaDgJX-G36k",
-          authDomain: "vintage-chat-36952.firebaseapp.com",
-          databaseURL: "https://vintage-chat-36952-default-rtdb.asia-southeast1.firebasedatabase.app",
-          projectId: "vintage-chat-36952",
-          storageBucket: "vintage-chat-36952.firebasestorage.app",
-          messagingSenderId: "502268108781",
-          appId: "1:502268108781:web:231b380f8abdfa78f751e4",
-          measurementId: "G-1DHFHTYP7C"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-        let currentUser = '';
+function init3DModel() {
+    const container = document.getElementById('taj-model-container');
+    
+    // Create controls container and append to chat container
+    const controlsDiv = document.createElement('div');
+    controlsDiv.className = 'controls-container';
+    document.querySelector('.chat-container').appendChild(controlsDiv);
 
-        // Add this right after firebase.initializeApp(firebaseConfig);
-        if (!firebase.apps.length) {
-            console.error('Firebase failed to initialize');
-        } else {
-            console.log('Firebase initialized successfully');
+    // Rest of the controls creation remains the same
+    const toggleBtn = document.createElement('button');
+    toggleBtn.innerHTML = '3D Control ON: OFF';
+    controlsDiv.appendChild(toggleBtn);
+
+    const infoBtn = document.createElement('button');
+    infoBtn.innerHTML = 'i';
+    infoBtn.className = 'info-btn';
+    controlsDiv.appendChild(infoBtn);
+
+    const tooltip = document.createElement('div');
+    tooltip.innerHTML = 'ON to Play with Taj Mahal<br>OFF To Scroll';
+    tooltip.className = 'tooltip';
+    controlsDiv.appendChild(tooltip);
+
+    // Show/hide tooltip
+    infoBtn.addEventListener('mouseenter', () => tooltip.style.display = 'block');
+    infoBtn.addEventListener('mouseleave', () => tooltip.style.display = 'none');
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 2000);
+    
+    const renderer = new THREE.WebGLRenderer({ 
+        alpha: true,
+        antialias: true 
+    });
+    
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+    
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.screenSpacePanning = false;
+    controls.minDistance = 100;
+    controls.maxDistance = 1000;
+    controls.minPolarAngle = Math.PI / 4;
+    controls.maxPolarAngle = Math.PI / 2;
+    
+    // Initially disable controls
+    controls.enabled = false;
+    renderer.domElement.style.pointerEvents = 'none';
+    
+    // Toggle controls
+    toggleBtn.addEventListener('click', () => {
+        controls.enabled = !controls.enabled;
+        renderer.domElement.style.pointerEvents = controls.enabled ? 'auto' : 'none';
+        toggleBtn.innerHTML = `3D Controls: ${controls.enabled ? 'ON' : 'OFF'}`;
+        toggleBtn.style.background = controls.enabled ? '#48bb78' : '#4a5568';
+    });
+
+    // Rest of your existing model loading code...
+    let tajModel;
+    
+    const loader = new THREE.GLTFLoader();
+    loader.load(
+        '.taj_mahal_3d_model/scene.gltf',
+        function (gltf) {
+            tajModel = gltf.scene;
+            
+            tajModel.traverse((node) => {
+                if (node.isMesh) {
+                    const newMaterial = new THREE.MeshPhongMaterial({
+                        color: 0xc0c0c0,
+                        emissive: 0x0,
+                        shininess: 30,
+                        specular: 0x444444
+                    });
+                    node.material = newMaterial;
+                }
+            });
+            
+            const box = new THREE.Box3().setFromObject(tajModel);
+            const center = box.getCenter(new THREE.Vector3());
+            tajModel.position.sub(center);
+            
+            tajModel.rotation.y = Math.PI * 10;
+            tajModel.rotation.x = 0;
+            tajModel.position.y = -50;
+            tajModel.scale.set(0.5, 0.6, 0.6);
+            
+            scene.add(tajModel);
+        }
+    );
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+    directionalLight.position.set(-1, 2, 1);
+    scene.add(directionalLight);
+    
+    camera.position.set(600, 300, 900);
+    camera.lookAt(0, 0, 0);
+    
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        if (tajModel) {
+            tajModel.rotation.y += 0.002;
+        }
+        
+        controls.update();
+        renderer.render(scene, camera);
+    }
+    animate();
+    
+    window.addEventListener('resize', onWindowResize, false);
+    function onWindowResize() {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    }
+}
+
+window.addEventListener('load', init3DModel);
+        
+        window.addEventListener('load', init3DModel);
+        
+        // Initialize or get chat state
+        function initializeChatState() {
+            if (!localStorage.getItem('chatState')) {
+                localStorage.setItem('chatState', JSON.stringify({
+                    messages: [],
+                    nikhilTaken: false,
+                    nikhTaken: false,
+                    activeUsers: []
+                }));
+            }
+            return JSON.parse(localStorage.getItem('chatState'));
         }
 
-        // Test database connection
-        db.ref('.info/connected').on('value', (snap) => {
-            if (snap.val() === true) {
-                console.log('Connected to Firebase');
-            } else {
-                console.log('Disconnected from Firebase');
-            }
-        });
+        let chatState = initializeChatState();
+        let currentUser = '';
 
+        // Function to join chat
         function joinChat() {
-            // Check available usernames
-            db.ref('users').once('value', (snapshot) => {
-                const users = snapshot.val() || {};
-                
-                if (!users.nikhilTaken) {
-                    currentUser = 'Nikhil';
-                    db.ref('users').update({ nikhilTaken: true });
-                } else if (!users.nikhTaken) {
-                    currentUser = 'Nikh';
-                    db.ref('users').update({ nikhTaken: true });
-                } else {
-                    alert('Chat room is full!');
-                    return;
-                }
+            chatState = JSON.parse(localStorage.getItem('chatState'));
+            
+            // Determine which name to assign
+            if (!chatState.nikhilTaken) {
+                currentUser = 'Nikhil';
+                chatState.nikhilTaken = true;
+            } else if (!chatState.nikhTaken) {
+                currentUser = 'Nikh';
+                chatState.nikhTaken = true;
+            } else {
+                alert('Chat room is full!');
+                return;
+            }
 
-                // Update UI
-                document.getElementById('nameSelection').style.display = 'none';
-                document.getElementById('messageArea').style.display = 'block';
-                document.querySelector('.chat-input').style.display = 'flex';
-                document.getElementById('currentUserInfo').textContent = `You are: ${currentUser}`;
+            chatState.activeUsers.push(currentUser);
+            localStorage.setItem('chatState', JSON.stringify(chatState));
 
-                // Send join message
-                db.ref('messages').push({
-                    sender: 'System',
-                    text: `${currentUser} has joined the chat`,
-                    timestamp: Date.now()
-                });
+            // Update UI
+            nameSelection.style.display = 'none';
+            messageArea.style.display = 'block';
+            document.querySelector('.chat-input').style.display = 'flex';
+            currentUserInfo.textContent = `You are: ${currentUser}`;
+
+            // Add system message
+            const joinMessage = {
+                sender: 'System',
+                text: `${currentUser} has joined the chat`,
+                timestamp: Date.now()
+            };
+            chatState.messages.push(joinMessage);
+            localStorage.setItem('chatState', JSON.stringify(chatState));
+            
+            // Start message polling
+            updateMessages();
+            setInterval(updateMessages, 1000);
+
+            // Set up disconnect handling
+            window.addEventListener('beforeunload', handleDisconnect);
+        }
+
+        function handleDisconnect() {
+            chatState = JSON.parse(localStorage.getItem('chatState'));
+            if (currentUser === 'Nikhil') {
+                chatState.nikhilTaken = false;
+            } else if (currentUser === 'Nikh') {
+                chatState.nikhTaken = false;
+            }
+            chatState.activeUsers = chatState.activeUsers.filter(user => user !== currentUser);
+            
+            // Add disconnect message
+            chatState.messages.push({
+                sender: 'System',
+                text: `${currentUser} has left the chat`,
+                timestamp: Date.now()
             });
+            
+            localStorage.setItem('chatState', JSON.stringify(chatState));
         }
 
         function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
-            
             if (message && currentUser) {
-                db.ref('messages').push({
+                chatState = JSON.parse(localStorage.getItem('chatState'));
+                chatState.messages.push({
                     sender: currentUser,
                     text: message,
                     timestamp: Date.now()
                 });
+                localStorage.setItem('chatState', JSON.stringify(chatState));
                 messageInput.value = '';
+                updateMessages();
             }
         }
 
-        // Listen for messages
-        db.ref('messages').on('value', (snapshot) => {
-            const messageArea = document.getElementById('messageArea');
+        function updateMessages() {
+            const newState = JSON.parse(localStorage.getItem('chatState'));
+            if (!newState) return;
+
             messageArea.innerHTML = '';
-            
-            const messages = snapshot.val() || {};
-            Object.values(messages).forEach(msg => {
-                const div = document.createElement('div');
-                div.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
+            newState.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender === currentUser ? 'sent' : 'received'}`;
                 if (msg.sender === 'System') {
-                    div.style.backgroundColor = '#718096';
-                    div.style.color = 'white';
-                    div.style.textAlign = 'center';
+                    messageDiv.style.backgroundColor = '#718096';
+                    messageDiv.style.color = 'white';
+                    messageDiv.style.textAlign = 'center';
+                    messageDiv.style.margin = '8px auto';
                 }
-                div.textContent = msg.sender === 'System' ? msg.text : `${msg.sender}: ${msg.text}`;
-                messageArea.appendChild(div);
+                messageDiv.textContent = msg.sender === 'System' ? msg.text : `${msg.sender}: ${msg.text}`;
+                messageArea.appendChild(messageDiv);
             });
             messageArea.scrollTop = messageArea.scrollHeight;
-        });
+        }
 
-        // Handle user disconnect
-        window.addEventListener('beforeunload', () => {
-            if (currentUser) {
-                db.ref('users').update({
-                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'nikhTaken']: false
-                });
-                db.ref('messages').push({
-                    sender: 'System',
-                    text: `${currentUser} has left the chat`,
-                    timestamp: Date.now()
-                });
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
             }
         });
+
         // Typing animation
-        const words = ["Mumtaz.", "Moonchild."];
+        const words = ["Mumtaz.", "her nickname."];
         const animatedWordElement = document.querySelector(".animated-word");
         let wordIndex = 0;
         let charIndex = 0;
@@ -324,9 +662,62 @@
         }
 
         typeAnimation();
+
         // Initial UI setup
-        document.getElementById('messageArea').style.display = 'none';
+        messageArea.style.display = 'none';
         document.querySelector('.chat-input').style.display = 'none';
+
+        window.onload = function() {
+        // Check if URL contains scroll parameter
+        if (window.location.search.includes('scroll=bottom')) {
+            // Attempt multiple scroll methods for better compatibility
+            setTimeout(function() {
+                // Method 1: Scroll to max height
+                window.scrollTo(0, document.documentElement.scrollHeight);
+                
+                // Method 2: Alternative scroll
+                window.scrollTo(0, 99999);
+                
+                // Method 3: Smooth scroll to bottom
+                window.scrollTo({
+                    top: document.documentElement.scrollHeight,
+                    behavior: 'smooth'
+                });
+                
+                // Method 4: Try scrolling the body
+                document.body.scrollTop = document.body.scrollHeight;
+                document.documentElement.scrollTop = document.documentElement.scrollHeight;
+            }, 100); // Small delay to ensure page is fully loaded
+        }
+    };
+// Initialize the animation
+const animation = lottie.loadAnimation({
+    container: document.getElementById('lottie-container'),
+    renderer: 'svg',
+    loop: true,
+    autoplay: true,
+    path: 'Animation - 1736322678190.json',
+    rendererSettings: {
+        preserveAspectRatio: 'xMidYMid slice',
+        clearCanvas: true
+    }
+});
+
+// Add class to make visible when loaded
+animation.addEventListener('DOMLoaded', function() {
+    const container = document.getElementById('lottie-container');
+    container.classList.add('visible');
+    
+    // Set timeout to remove the animation after 5 seconds
+    setTimeout(() => {
+        container.style.opacity = '0';
+        // Optional: stop the animation and remove the element after fade out
+        setTimeout(() => {
+            animation.stop();
+            container.remove();
+        }, 500);
+    }, 5000);
+});
     </script>
 </body>
 </html>

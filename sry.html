@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apology Page</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,400&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Previous styles remain the same */
+        @font-face {
+            font-family: 'Rumburak';
+            src: url('rumburak/Rumburak.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            font-family: 'Rumburak', serif;
+            background-image: url('Untitled design (9).png');
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            color: #1a1a1a;
+            line-height: 8.0;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                311deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255 255 255 / 0.23) 100%
+            );
+            pointer-events: none;
+        }
+
+        .content-wrapper {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: left;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .sorry-text {
+            display: flex;
+            align-items: baseline;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .im {
+            font-size: 24px;
+            font-style: italic;
+            color: #1a1a1a;
+        }
+
+        .sorry-container {
+            display: flex;
+            align-items: baseline;
+            gap: 20px;
+        }
+
+        .sorry {
+            font-size: 100px;
+            font-weight: 700;
+            line-height: 1;
+            margin: 0;
+            color: #1a1a1a;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            font-size: 22px;
+            color: #1a1a1a;
+            margin: 0;
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .poem-container {
+            max-width: 600px;
+            margin-left: 40px;
+            position: relative;
+        }
+
+        .poem {
+            font-size: 25px;
+            line-height: 1.1;
+            color: #1a1a1a;
+            font-weight: 500;
+            letter-spacing: 0.2px;
+        }
+
+        .poem p {
+            margin: 12px 0;
+            transition: transform 0.3s ease;
+            padding-left: 20px;
+        }
+
+        .poem p::before {
+            content: '✽';
+            position: absolute;
+            left: 0;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-size: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4a4a4a;
+        }
+
+        .poem p:hover {
+            transform: translateX(10px);
+        }
+
+        .poem p:hover::before {
+            opacity: 0.7;
+        }
+
+        /* New styles for the button and tooltip */
+        .button-container {
+            position: relative;
+            display: inline-block;
+        }
+
+        .begin-button {
+            background: none;
+            border: none;
+            font-family: 'Rumburak', serif;
+            font-size: 25px;
+            color: #1a1a1a;
+            cursor: pointer;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            padding-right: 30px;
+        }
+
+        .begin-button:hover {
+            color: #4a4a4a;
+            transform: translateX(10px);
+        }
+
+        .info-icon {
+            position: absolute;
+            top: -10px;
+            right: 0;
+            font-size: 16px;
+            color: #1a1a1a;
+            cursor: help;
+            background: #ffffff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .info-tooltip {
+            visibility: hidden;
+            background-color: rgba(26, 26, 26, 0.9);
+            color: white;
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-family: Arial, sans-serif;
+        }
+
+        .info-icon:hover .info-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .sorry {
+                font-size: 60px;
+            }
+            
+            .subtitle {
+                font-size: 16px;
+            }
+            
+            .sorry-container {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+        }
+
+        /* Animation styles remain the same */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .content-wrapper {
+            animation: fadeIn 1.5s ease-out forwards;
+        }
+
+        .poem p {
+            opacity: 0;
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+
+        .poem p:nth-child(1) { animation-delay: 0.2s; }
+.poem p:nth-child(2) { animation-delay: 0.4s; }
+.poem p:nth-child(3) { animation-delay: 0.6s; }
+.poem p:nth-child(4) { animation-delay: 0.8s; }
+.poem p:nth-child(5) { animation-delay: 1.0s; }
+.poem p:nth-child(6) { animation-delay: 1.2s; }
+.poem p:nth-child(7) { animation-delay: 1.4s; }
+.poem p:nth-child(8) { animation-delay: 1.6s; }
+.poem p:nth-child(9) { animation-delay: 1.8s; }
+.poem p:nth-child(10) { animation-delay: 2.0s; }
+.poem p:nth-child(11) { animation-delay: 2.2s; }
+.poem p:nth-child(12) { animation-delay: 2.4s; }
+.poem p:nth-child(13) { animation-delay: 2.6s; }
+.poem p:nth-child(14) { animation-delay: 2.8s; }
+.poem p:nth-child(15) { animation-delay: 3.0s; }
+.poem p:nth-child(16) { animation-delay: 3.2s; }
+.poem p:nth-child(17) { animation-delay: 3.4s; }
+.poem p:nth-child(18) { animation-delay: 3.6s; }
+.poem p:nth-child(19) { animation-delay: 3.8s; }
+.poem p:nth-child(20) { animation-delay: 4.0s; }
+.poem p:nth-child(21) { animation-delay: 4.2s; }
+.poem p:nth-child(22) { animation-delay: 4.4s; }
+.poem p:nth-child(23) { animation-delay: 4.6s; }
+.poem p:nth-child(24) { animation-delay: 4.8s; }
+.poem p:nth-child(25) { animation-delay: 5.0s; }
+.poem p:nth-child(26) { animation-delay: 5.2s; }
+.poem p:nth-child(27) { animation-delay: 5.4s; }
+
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header class="header">
+            <div class="sorry-text">
+                <span class="im">I'm</span>
+                <div class="sorry-container">
+                    <h1 class="sorry">SORRY</h1>
+                    <p class="subtitle">For all the things I did that hurt you</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="poem-container">
+            <div class="decorative-line"></div>
+
+            <div class="poem">
+                <p>When you said "It's just been one week," </p>
+                <p>I smiled, thinking love comes quick and fleet. </p>
+                <p>But now it's a year, and here I remain.</p>
+                <br>
+                <p>You and I, like strangers still,</p>
+                <p>Neither of us truly knows the other,</p>
+                <p>Do I get angry? Do you?</p>
+                <p>What makes us smile, what makes us suffer.</p>
+                <p>We judged the unknown, and let it define us,</p>
+                <p>Is it fair to close what could intertwine?</p>
+                <br>
+                <p>I planned for July, your day to surprise,</p>
+                <p>A gift, stolen blue,where love's notes soar</p>
+                <p>But my message fell silent, lost in the stream,</p>
+                <p>And so did the present, and so did the dream.</p>
+                <p>I wonder if you'd see, had you opened that door.</p>
+                <br>
+                <p>I wish for a power, a divine gift,</p>
+                <p>To turn back the clock, to rewrite time.</p>
+                <p>I pray to the stars, I plead with the skies,</p>
+                <p>To undo the moments that brought your goodbyes.</p>
+                <br>
+                <p>Tomorrow is a brand new day that has never been touched </p>
+                <p>Let's forget all the things that happened</p>
+                <p>Let's leave the past behind and try again.</p>
+                <div class="button-container">
+                    <button class="begin-button" onclick="redirectToChat()">Let's begin again!?</button>
+                    <span class="info-icon">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="info-tooltip">Click on the last line</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function redirectToChat() {
+            // Add a specific target to the URL
+            window.location.href = 'index.html?scroll=bottom#chat';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Romantic Memories</title>
+    <style>
+        @font-face {
+            font-family: 'Rumburak';
+            src: url('rumburak/Rumburak.ttf') format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: url('Untitled design (7).png') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Rumburak', serif;
+        }
+
+        .slider {
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .item {
+            position: absolute;
+            width: 400px;
+            height: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            transition: all 0.5s ease;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 1.5em;
+            line-height: 1.3;
+            color: #333;
+            overflow: hidden;
+            font-family: 'Rumburak', serif;
+        }
+
+        .item.image-only {
+            padding: 0;
+            background: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .item.image-only img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            margin: 0;
+        }
+
+        .item.text-only {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+            border: 2px solid rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(5px);
+        }
+
+        .item.text-only::before {
+            content: '"';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 4em;
+            color: rgba(0, 0, 0, 0.1);
+            font-family: 'Rumburak', serif;
+        }
+
+        .item:not(.image-only) img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .text {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            margin-top: 20px;
+            font-family: 'Rumburak', serif;
+        }
+
+        .text h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-family: 'Rumburak', serif;
+        }
+
+        .text h2 {
+            font-size: 1.2em; /* Reduced from 1.5em */
+            margin-bottom: 15px;
+            color: #34495e;
+            font-family: 'Rumburak', serif;
+            line-height: 1.4; /* Added for better readability */
+            max-width: 90%; /* Added to ensure text stays within bounds */
+            margin: 0 auto; /* Center the text block */
+        }
+
+        button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.8);
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Rumburak', serif;
+        }
+
+        button::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #2c3e50;
+            animation: pulse 2s infinite;
+        }
+
+        button:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        #prev {
+            left: 20px;
+        }
+
+        #next {
+            right: 20px;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        .active {
+            z-index: 1;
+        }
+
+        @media (max-width: 768px) {
+            .item {
+                width: 300px;
+                height: 400px;
+            }
+            
+            button {
+                width: 40px;
+                height: 40px;
+            }
+
+            .text h2 {
+                font-size: 1em; /* Even smaller text on mobile */
+            }
+        }
+        .contact { 
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    height: 100px; /* Reduced from 250px */
+    width: 100px; /* Reduced from 250px */
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 2px;
+    z-index: 1000;
+    cursor: pointer;
+    transform: scale(0.5); /* Makes it even smaller */
+}
+
+        .contact .envelope {
+            position: absolute;
+            height: 93px;
+            width: 165px;
+            left: 50%;
+            margin-left: -83px;
+            top: 50%;
+            margin-top: -50px;
+            background: #F9F9F9;
+            transition: margin-top 300ms;
+        }
+
+        /* Rest of the envelope styles */
+        .contact:hover .envelope {
+            transition-delay: 150ms;
+            margin-top: -20px;
+        }
+
+        .contact .envelope .top {
+            position: absolute;
+            top: -3px;
+            left: 0px;
+            width: 100%;
+            height: 73px;
+            z-index: 30;
+            overflow: hidden;
+            transform-origin: top;
+            transition: transform 300ms 150ms, z-index 0ms 150ms, height 300ms 0ms, top 300ms 0ms;
+        }
+
+        .contact:hover .envelope .top {
+            transition: transform 300ms 0ms, height 300ms 150ms, top 300ms 150ms;
+            height: 10px;
+            top: -60px;
+            transform: rotateX(180deg);
+        }
+
+        /* Add all other envelope styles here */
+        .contact .envelope .outer {
+            position: absolute;
+            bottom: 0px;
+            left: 0px;
+            border-left: 83px solid transparent;
+            border-right: 82px solid transparent;
+            border-top: 70px solid #EEE;
+        }
+
+        .contact .envelope .outer .inner {
+            position: absolute;
+            left: -81px;
+            top: -73px;
+            border-left: 81px solid transparent;
+            border-right: 80px solid transparent;
+            border-top: 68px solid #333;
+        }
+
+        .contact .envelope .bottom {
+            position: absolute;
+            z-index: 20;
+            bottom: 0px;
+            left: 2px;
+            border-left: 81px solid transparent;
+            border-right: 80px solid transparent;
+            border-bottom: 45px solid #333;
+        }
+
+        .contact .envelope .left {
+            position: absolute;
+            z-index: 20;
+            top: 0px;
+            left: 0px;
+            border-left: 81px solid #333;
+            border-top: 45px solid transparent;
+            border-bottom: 45px solid transparent;
+        }
+
+        .contact .envelope .right {
+            position: absolute;
+            z-index: 20;
+            top: 0px;
+            right: 0px;
+            border-right: 80px solid #333;
+            border-top: 45px solid transparent;
+            border-bottom: 45px solid transparent;
+        }
+
+        .contact .envelope .cover {
+            position: absolute;
+            z-index: 15;
+            bottom: 0px;
+            left: 0px;
+            height: 55%;
+            width: 100%;
+            background: #EEE;
+        }
+
+        .contact .envelope .paper {
+            position: absolute;
+            height: 83px;
+            padding-top: 10px;
+            width: 100%;
+            top: 0px;
+            left: 0px;
+            background: #F9F9F9;
+            z-index: 10;
+            transition: margin-top 300ms 0ms;
+        }
+
+        .contact:hover .envelope .paper {
+            margin-top: -60px;
+            transition: margin-top 300ms 150ms;
+        }
+
+        .contact .envelope .paper a {
+    position: relative;
+    display: block;
+    font-size: 24px;  /* Increased from 14px to 24px */
+    margin: 5px;
+    margin-bottom: 0px;
+    text-align: center;
+    color: #333;
+    text-decoration: none;
+    transition: color 200ms;
+    font-family: Arial, sans-serif;  /* Changed to a normal font */
+}
+
+        .contact .envelope .paper a:hover {
+            color: gray;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="slider">
+        <!-- Original slider content -->
+        <div class="item image-only">
+            <img src="test (2).png" alt="First Memory">
+        </div>
+        <div class="item text-only">
+            It all started with a simple—'Let's go fill the petrol.' who knew that first ride would rather turn out into this
+        </div>
+        <div class="item">
+            <img src="test (3).png" alt="Special Moment">
+            <div class="text">
+                <h2>- Do you prefer to be called mine instead? -</h2>
+            </div>
+        </div>
+        <div class="item text-only">
+            Remember when I promised to come for you—on a unicorn, sword in hand, battling dragons to make you my princess?
+            <br>
+            <br>
+            <p>I still wish to show you that I can keep that promise.</p>
+        </div>
+        <div class="item">
+            <img src="test (1).png" alt="Future Dreams">
+            <div class="text">
+                <p>I still remember that time I guessed your top 5 songs—'song name' included. I loved learning the little things that made you, you. I'd love to do it all over again, with the present you</p>
+            </div>
+        </div>
+        <button id="prev"><</button>
+        <button id="next">></button>
+    </div>
+
+    <!-- Added envelope -->
+    <div class="contact" onclick="window.location.href='sry.html'">
+        <div class="envelope">
+            <div class="top">
+                <div class="outer"><div class="inner"></div></div>
+            </div>
+            <div class="bottom"></div>
+            <div class="left"></div>
+            <div class="right"></div>
+            <div class="cover"></div>
+            <div class="paper">
+                <a class="call" href="sry.html"><i class="icon-phone"></i> Click on this</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
