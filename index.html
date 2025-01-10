@@ -309,7 +309,9 @@
                 <button onclick="sendMessage()">Send</button>
             </div>
         </div>
-        <div id="taj-model-container"></div>
+        <div id="taj-model-container" >
+            
+        </div>
         <div class="heart-container">
             <a href="mem.html" class="heart-container">
             <svg version="1.1" id="a" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
@@ -397,12 +399,33 @@
         function init3DModel() {
     const container = document.getElementById('taj-model-container');
     
+    // Create loading animation container
+    const loadingContainer = document.createElement('div');
+    loadingContainer.style.cssText = `
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        z-index: 1000;
+    `;
+    container.appendChild(loadingContainer);
+
+    // Initialize loading animation
+    const loadingAnimation = lottie.loadAnimation({
+        container: loadingContainer,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: 'z4KqxfRZ4w.json'
+    });
+
     // Create controls container and append to chat container
     const controlsDiv = document.createElement('div');
     controlsDiv.className = 'controls-container';
     document.querySelector('.chat-container').appendChild(controlsDiv);
 
-    // Rest of the controls creation remains the same
     const toggleBtn = document.createElement('button');
     toggleBtn.innerHTML = '3D Control ON: OFF';
     controlsDiv.appendChild(toggleBtn);
@@ -417,7 +440,6 @@
     tooltip.className = 'tooltip';
     controlsDiv.appendChild(tooltip);
 
-    // Show/hide tooltip
     infoBtn.addEventListener('mouseenter', () => tooltip.style.display = 'block');
     infoBtn.addEventListener('mouseleave', () => tooltip.style.display = 'none');
 
@@ -431,6 +453,7 @@
     
     renderer.setSize(container.clientWidth, container.clientHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.domElement.style.display = 'none'; // Hide renderer initially
     container.appendChild(renderer.domElement);
     
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -442,11 +465,9 @@
     controls.minPolarAngle = Math.PI / 4;
     controls.maxPolarAngle = Math.PI / 2;
     
-    // Initially disable controls
     controls.enabled = false;
     renderer.domElement.style.pointerEvents = 'none';
     
-    // Toggle controls
     toggleBtn.addEventListener('click', () => {
         controls.enabled = !controls.enabled;
         renderer.domElement.style.pointerEvents = controls.enabled ? 'auto' : 'none';
@@ -454,10 +475,10 @@
         toggleBtn.style.background = controls.enabled ? '#48bb78' : '#4a5568';
     });
 
-    // Rest of your existing model loading code...
     let tajModel;
-    
     const loader = new THREE.GLTFLoader();
+    
+    // Load the model
     loader.load(
         '.taj_mahal_3d_model/scene.gltf',
         function (gltf) {
@@ -485,6 +506,21 @@
             tajModel.scale.set(0.5, 0.6, 0.6);
             
             scene.add(tajModel);
+
+            // Remove loading animation and show the model
+            loadingAnimation.destroy();
+            loadingContainer.remove();
+            renderer.domElement.style.display = 'block';
+        },
+        // Progress callback
+        function (xhr) {
+            console.log((xhr.loaded / xhr.total * 100) + '% loaded');
+        },
+        // Error callback
+        function (error) {
+            console.error('An error occurred loading the model:', error);
+            loadingAnimation.destroy();
+            loadingContainer.innerHTML = 'Error loading model';
         }
     );
     
