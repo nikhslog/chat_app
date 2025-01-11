@@ -599,9 +599,9 @@ window.addEventListener('load', init3DModel);
                 if (!users.nikhilTaken) {
                     currentUser = 'Nikhil';
                     db.ref('users').update({ nikhilTaken: true });
-                } else if (!users.hernameTaken) {
-                    currentUser = 'hername';
-                    db.ref('users').update({ hernameTaken: true });
+                } else if (!users.MoonchildTaken) {
+                    currentUser = 'Moonchild';
+                    db.ref('users').update({ MoonchildTaken: true });
                 } else {
                     alert('Chat room is full!');
                     return;
@@ -660,7 +660,7 @@ window.addEventListener('load', init3DModel);
         window.addEventListener('beforeunload', () => {
             if (currentUser) {
                 db.ref('users').update({
-                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'hernameTaken']: false
+                    [currentUser === 'Nikhil' ? 'nikhilTaken' : 'MoonchildTaken']: false
                 });
                 db.ref('messages').push({
                     sender: 'System',
